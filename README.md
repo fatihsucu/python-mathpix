@@ -16,9 +16,9 @@ python setup.py install
 
 ##### Examples
 ```
-from mathpix import Mathpix
+from mathpix.mathpix import MathPix
 
-mathpix = Mathpix(app_id="you_app_id", app_key="your_app_key")
+mathpix = MathPix(app_id="you_app_id", app_key="your_app_key")
 ```
 You can process image with image url.
 ```

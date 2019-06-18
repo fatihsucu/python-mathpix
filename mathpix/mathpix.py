@@ -12,12 +12,14 @@ class Position(object):
 
     @classmethod
     def load(cls, data):
-        return Position(
-            height=data.get('height'),
-            top_left_x=data.get('top_left_x'),
-            top_left_y=data.get('top_left_y'),
-            width=data.get('width')
-        )
+        if data:
+            return Position(
+                height=data.get('height'),
+                top_left_x=data.get('top_left_x'),
+                top_left_y=data.get('top_left_y'),
+                width=data.get('width')
+            )
+        return None
 
     def __json__(self):
         return {
@@ -46,16 +48,18 @@ class DetectionMap(object):
 
     @classmethod
     def load(cls, data):
-        return DetectionMap(
-            contains_chart=data.get('contains_chart'),
-            contains_diagram=data.get('contains_diagram'),
-            contains_graph=data.get('contains_graph'),
-            contains_geometry=data.get('contains_geometry'),
-            contains_table=data.get('contains_table'),
-            is_inverted=data.get('is_inverted'),
-            is_not_math=data.get('is_not_math'),
-            is_printed=data.get('is_printed')
-        )
+        if data:
+            return DetectionMap(
+                contains_chart=data.get('contains_chart'),
+                contains_diagram=data.get('contains_diagram'),
+                contains_graph=data.get('contains_graph'),
+                contains_geometry=data.get('contains_geometry'),
+                contains_table=data.get('contains_table'),
+                is_inverted=data.get('is_inverted'),
+                is_not_math=data.get('is_not_math'),
+                is_printed=data.get('is_printed')
+            )
+        return None
 
     def __json__(self):
         return {
@@ -106,11 +110,11 @@ class Ocr(object):
     def __json__(self):
         payload = {
             "detection_list": self.detection_list,
-            "detection_map": self.detection_map.__json__(),
+            "detection_map": self.detection_map.__json__() if self.detection_map else None,
             "error": self.error,
             "latex": self.latex,
             "latex_confidence": self.latex_confidence,
-            "position": self.position.__json__()
+            "position": self.position.__json__() if self.position else None
         }
         if self.reply:
             return {
