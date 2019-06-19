@@ -1,6 +1,7 @@
 import unittest
-from .dataset import ocr_data, position_data, detection_map
-from mathpix.mathpix import Ocr, Position, DetectionMap
+from .dataset import ocr_data, position_data, detection_map, callback_data
+from mathpix.mathpix import Ocr, Position, DetectionMap, Callback
+from mathpix.errors import InvalidCallbackException
 
 
 class OcrTest(unittest.TestCase):
@@ -37,3 +38,27 @@ class OcrTest(unittest.TestCase):
         self.assertEqual(detection_map_ins.contains_diagram, detection_map['contains_diagram'])
         self.assertEqual(detection_map_ins.contains_chart, detection_map['contains_chart'])
         self.assertEqual(detection_map_ins.__json__().keys(), detection_map.keys())
+
+    def test_callback_load_and_to_mathpix_api(self):
+        callback = Callback.load(callback_data)
+        assert isinstance(callback, Callback)
+        callback.validate()
+        self.assertTrue(callback.is_valid())
+        self.assertIn(callback_data['method'], callback.to_mathpix_payload())
+        self.assertEqual(callback_data['url'], callback.to_mathpix_payload()[callback_data['method']])
+        self.assertEqual(callback_data['sessionId'], callback.to_mathpix_payload()['reply'])
+
+    def test_invalid_callback(self):
+        custom_payload = callback_data.copy()
+        custom_payload['method'] = "delete"
+        callback = Callback.load(custom_payload)
+        assert isinstance(callback, Callback)
+        self.assertRaises(Exception, callback.is_valid)
+        self.assertRaises(InvalidCallbackException, callback.validate)
+
+        custom_payload = callback_data.copy()
+        custom_payload['url'] = "some_invalid_url"
+        callback = Callback.load(custom_payload)
+        assert isinstance(callback, Callback)
+        self.assertRaises(Exception, callback.is_valid)
+        self.assertRaises(InvalidCallbackException, callback.validate)

@@ -1,5 +1,55 @@
 from .client import Client
 from .utils import encode_image, encode_image_from_url
+from .errors import InvalidCallbackException
+
+
+class Callback(object):
+
+    def __init__(self, method, url, sessionId):
+        self.method = method
+        self.url = url
+        self.sessionId = sessionId
+        self.validation_result = None
+
+    def validate(self, raise_exception=True):
+        if not isinstance(self.method, str):
+            if raise_exception:
+                self.validation_result = False
+                raise InvalidCallbackException("Expected method as string found {}".format(type(self.method)))
+
+        if self.method.lower() not in ['put', 'post', 'get']:
+            if raise_exception:
+                self.validation_result = False
+                raise InvalidCallbackException(
+                    "Http Method should be one of get, post or put. Found {}".format(self.method)
+                )
+
+        if not self.url.startswith("http"):
+            if raise_exception:
+                self.validation_result = False
+                raise InvalidCallbackException("Invalid url found. Url must starts with http or https")
+
+        self.validation_result = True
+        return self
+
+    def is_valid(self):
+        if self.validation_result == None:
+            raise Exception("validate should call before is_valid method.")
+        return self.validation_result
+
+    @classmethod
+    def load(cls, data):
+        return Callback(
+            method=data.get('method'),
+            url=data.get('url'),
+            sessionId=data.get('sessionId')
+        )
+
+    def to_mathpix_payload(self):
+        return {
+            self.method : self.url,
+            "reply": self.sessionId
+        }
 
 
 class Position(object):
@@ -156,7 +206,10 @@ class MathPix(object):
             optionals["confidence_rate_threshold"] = confidence_rate_threshold
 
         if callback:
-            optionals["callback"] = callback
+            callback_ins = Callback.load(callback)
+
+            if callback_ins.is_valid():
+                optionals["callback"] = callback_ins.to_mathpix_payload()
 
         payload = {
             "src": "data:image/jpeg;base64, {}".format(encoded),
@@ -169,7 +222,10 @@ class MathPix(object):
         ocrs = list()
         payload = {}
         if callback:
-            payload["callback"] = callback
+            callback_ins = Callback.load(callback)
+
+            if callback_ins.is_valid():
+                payload["callback"] = callback_ins.to_mathpix_payload()
 
         response = self.client.post({**payload, **urls})
 

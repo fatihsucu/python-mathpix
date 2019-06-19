@@ -56,6 +56,12 @@ bulk_image_response = {
   }
 }
 
+callback_data = {
+    "method": "post",
+    "url": "https://www.someurl.com",
+    "sessionId": "some_id"
+}
+
 position_data = {
    "height": 215,
    "top_left_x": 57,

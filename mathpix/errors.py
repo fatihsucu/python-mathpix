@@ -67,3 +67,7 @@ class UnknownBatchIdException(BaseException):
 
 class SysException(BaseException):
     pass
+
+
+class InvalidCallbackException(BaseException):
+    pass
