@@ -1,6 +1,6 @@
 from .client import Client
 from .utils import encode_image, encode_image_from_url
-from .errors import InvalidCallbackException
+from .errors import InvalidCallbackException, InvalidUrlException
 
 
 class Callback(object):
@@ -49,6 +49,29 @@ class Callback(object):
         return {
             self.method : self.url,
             "reply": self.sessionId
+        }
+
+
+class ImageUrl(object):
+
+    def __init__(self, key, url):
+        self.key = key
+        self.url = url
+        if not self.url.startswith("http"):
+            raise InvalidUrlException("Invalid url found. Url must starts with http or https")
+
+    @classmethod
+    def load(cls, data):
+        if data:
+            return ImageUrl(
+                key=data.get('key'),
+                url=data.get('url')
+            )
+        return None
+
+    def to_mathpix_payload(self):
+        return {
+            self.key : self.url
         }
 
 
@@ -219,15 +242,19 @@ class MathPix(object):
         return Ocr.load(response)
 
     def process_image_bulk(self, urls, callback=None):
+        url_payload = dict()
         ocrs = list()
-        payload = {}
+        payload = dict()
+
+        for url in urls:
+            url_payload = {**url_payload, **url.to_mathpix_payload()}
+
         if callback:
-            callback_ins = Callback.load(callback)
+            callback.validate()
+            if callback.is_valid():
+                payload["callback"] = callback.to_mathpix_payload()
 
-            if callback_ins.is_valid():
-                payload["callback"] = callback_ins.to_mathpix_payload()
-
-        response = self.client.post({**payload, **urls})
+        response = self.client.post({**payload, **url_payload})
 
         for k, v in response['result'].items():
             ocr = Ocr.load(v)

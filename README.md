@@ -28,6 +28,28 @@ Or with image path.
 ```
 ocr = mathpix.process_image(image_path="/path/to/perfect/image.jpg")
 ```
+Create a bulk for bulk process
+```
+from mathpix.mathpix import ImageUrl
+urls = [ImageUrl(key="algebria", url="https://image_url"), ImageUrl(key="geometry", url="https://image_url_2")]
+ocr = mathpix.process_image_bulk(urls=urls)
+```
+
+Defining a callback
+```
+from mathpix.mathpix import Callback
+callback = Callback(method="post", url="https://some_callback_url", sessionId="somesessionId")
+```
+Validation of callback
+```
+callback.validate(raise_exception=True) #raise_exception True raises exception
+```
+After validation of callback you can ask `is_valid()` to callback instance.
+```
+callback.is_valid()
+>>> True
+```
+
 ```
 print(ocr.latex)
 >>>'\\left. \\begin{array} { l } { \\quad f ( 2 x ) + f ( \\frac { x } { 3 } ) } \\\\ { \\text { fonksiyonunun periyodu kaçtir? } } \\\\ { \\left. \\begin{array} { l l l l } { \\text { A) } 3 } & { \\text { B) } 6 } & { \\text { C) } 9 } & { \\text { D) } 12 } & { \\text { E) } 1 ! } \\end{array} \\right. } \\end{array} \\right.'

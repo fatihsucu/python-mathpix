@@ -71,3 +71,7 @@ class SysException(BaseException):
 
 class InvalidCallbackException(BaseException):
     pass
+
+
+class InvalidUrlException(BaseException):
+    pass

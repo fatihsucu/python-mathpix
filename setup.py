@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='python-mathpix',
-    version='0.3',
+    version='0.4',
     description='Python Mathpix Api Wrapper',
     url='https://github.com/fatihsucu/python-mathpix',
     author='Fatih Sucu',

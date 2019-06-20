@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch
 from .dataset import *
-from mathpix.mathpix import MathPix, Ocr, Position, DetectionMap
+from mathpix.mathpix import MathPix, Ocr, Position, DetectionMap, ImageUrl
 from mathpix.errors import *
 
 
@@ -34,7 +34,9 @@ class MathPixTest(unittest.TestCase):
             "inverted": "https://raw.githubusercontent.com/Mathpix/api-examples/master/images/inverted.jpg",
             "algebra": "https://raw.githubusercontent.com/Mathpix/api-examples/master/images/algebra.jpg"
         }
-        ocrs = MathPix(app_key="test_key", app_id="test_id").process_image_bulk(urls=urls)
+
+        url_list = [ImageUrl(key=k, url=v) for k, v in urls.items()]
+        ocrs = MathPix(app_key="test_key", app_id="test_id").process_image_bulk(urls=url_list)
 
         assert isinstance(ocrs, list)
         self.assertIn("algebra", [ocr.reply for ocr in ocrs])
